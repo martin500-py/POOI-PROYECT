@@ -26,6 +26,8 @@ public class PANEL01_LOGUEO extends javax.swing.JFrame {
     ArrayList<DOCENTE> docentes;
     ArrayList<MATRICULA> matriculas;
     ArrayList<CURSO> cursos;
+    
+    private int prueba;
 
     boolean escoge = true;
 
