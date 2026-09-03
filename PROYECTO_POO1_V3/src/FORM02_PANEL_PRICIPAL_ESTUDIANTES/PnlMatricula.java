@@ -19,14 +19,11 @@ public class PnlMatricula extends javax.swing.JPanel {
 
     public PnlMatricula(ArrayList<CURSO> cursos, ArrayList<MATRICULA> matricula, ALUMNO a) {
         initComponents();
-
         this.cursos = cursos;
         this.matricula = matricula;
         this.a = a;
-
         TablaCursos = (DefaultTableModel) jTable1.getModel();
         btnMatricular.setEnabled(false);
-
         CargarDatosAlumnos();
         inicializarTabla();
         cargarCursosEnTabla();
@@ -75,18 +72,41 @@ public class PnlMatricula extends javax.swing.JPanel {
 
         for (int i = 0; i < cursos.size(); i++) {
             CURSO c = cursos.get(i);
+            String nombreBD = (c.getNombrecurso() != null) ? c.getNombrecurso().trim() : "";
+            String nombreMayus = nombreBD.toUpperCase();
+
+            String codigo = "";
+            int creditos = 4;
+
+            // Detectamos el curso según el nombre registrado en la base de datos
+            if (nombreMayus.contains("ORIENT") || nombreMayus.contains("OBJETO") || nombreMayus.contains("POO")) {
+                codigo = "ESPOO07";
+                creditos = 4;
+            } else if (nombreMayus.contains("BASE DE DATO")) {
+                codigo = "ESBDD09";
+                creditos = 3;
+            } else if (nombreMayus.contains("DISCRETA")) {
+                codigo = "EEMD005";
+                creditos = 2;
+            } else if (nombreMayus.contains("ESTRUCTURA")) {
+                codigo = "ESEDA04";
+                creditos = 4;
+            } else if (nombreMayus.contains("OPERATIVO")) {
+                codigo = "ESSIO14";
+                creditos = 3;
+            }
 
             Object[] fila = new Object[]{
-                (i + 1),
-                "000" + (i + 1),
-                c.getNombrecurso(),
-                "05",
-                "O",
-                "P",
-                4,
-                0,
-                false,
-                ""
+                (i + 1),               // N°
+                codigo,                // Código asignado
+                nombreBD,              // Nombre tal cual está registrado en tu BD
+                "05",                  // Ciclo
+                "O",                   // Tipo
+                "P",                   // Estado
+                creditos,              // Créditos
+                0,                     // NV
+                false,                 // Checkbox
+                ""                     // Grupo
             };
             TablaCursos.addRow(fila);
         }
