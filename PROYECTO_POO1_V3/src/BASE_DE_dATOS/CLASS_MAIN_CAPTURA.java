@@ -226,7 +226,7 @@ public class CLASS_MAIN_CAPTURA {
 
                 DOCENTE docente = new DOCENTE(rs.getString("Codigo"), rs.getString("Contraseña"), rs.getString("Dni"), rs.getString("NombreCompleto"), rs.getString("Telefono"), rs.getString("CorreoInstitucional"));
 
-                CURSO cu = new CURSO(docente, rs.getString("NombreCurso"));
+                CURSO cu = new CURSO(docente, rs.getString("NombreCurso"), rs.getString("codigo"),rs.getInt("credito"));
                 cursos.add(cu);
             }
 
@@ -329,11 +329,11 @@ public class CLASS_MAIN_CAPTURA {
                         rs.getString("CorreoDocente")
                 );
 
-                CURSO curso = new CURSO(docente, rs.getString("NombreCurso"));
+                CURSO cu = new CURSO(docente, rs.getString("NombreCurso"), rs.getString("codigo"),rs.getInt("credito"));
 
                 MATRICULA m = new MATRICULA(
                         alumno,
-                        curso,
+                        cu,
                         rs.getString("CicloRelativo"),
                         rs.getInt("CreditosCiclo"),
                         rs.getDouble("PromedioPracticas"),

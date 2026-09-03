@@ -42,11 +42,12 @@ public class PnlMatricula extends javax.swing.JPanel {
         if (a != null) {
             lbldatosalumno.setText("ALUMNO: " + a.getCodigo() + " - " + a.getNombre_completo());
         }
+
     }
 
     private void inicializarTabla() {
         String[] columnas = {
-            "N°", "CODIGO", "NOMBRE CURSO", "CICLO", "TIPO",
+            "N°", "CODIGO", "NOMBRE CURSO", "CICLO",
             "EST", "NC", "NV", "*", "GRUPO"
         };
 
@@ -70,42 +71,53 @@ public class PnlMatricula extends javax.swing.JPanel {
 
     private void cargarCursosEnTabla() {
         TablaCursos.setRowCount(0);
-        if (cursos == null) {
-            cursos = bd.getarraycurso();
-        }
+        int orden = 1;
 
-        if (cursos != null) {
-            for (int i = 0; i < cursos.size(); i++) {
-                CURSO c = cursos.get(i);
-                String nombre = c.getNombrecurso();
-
-                String codigo = "";
-                int creditos = 0;
-
-                if (nombre.equalsIgnoreCase("Programación Orientada a Objetos")) {
-                    codigo = "ESPOO07";
-                    creditos = 4;
-                } else if (nombre.equalsIgnoreCase("Base de Datos I")) {
-                    codigo = "ESBDD09";
-                    creditos = 3;
-                } else if (nombre.equalsIgnoreCase("Matemática Discreta")) {
-                    codigo = "EEMD005";
-                    creditos = 2;
-                } else if (nombre.equalsIgnoreCase("Estructura de Datos")) {
-                    codigo = "ESEDA04";
-                    creditos = 4;
-                } else if (nombre.equalsIgnoreCase("Sistemas Operativos")) {
-                    codigo = "ESSIO14";
-                    creditos = 3;
-                }
-
-                Object[] fila = new Object[]{
-                    (i + 1), codigo, nombre, "05", "O", "P", creditos, 0, false, ""
-                };
-                TablaCursos.addRow(fila);
+        for (CURSO c : cursos) {
+            String nombre = "";
+            if (c.getNombrecurso() != null) {
+                nombre = c.getNombrecurso();
             }
+            String codigo = "COD00" + orden;
+            int creditos = 0;
+            if (orden == 1) {
+                creditos = 4;
+            } else if (orden == 2) {
+                creditos = 3;
+            } else if (orden == 3) {
+                creditos = 2;
+            } else if (orden == 4) {
+                creditos = 4;
+            } else if (orden == 5) {
+                creditos = 3;
+            }
+            Object[] fila = new Object[]{
+                orden, codigo, nombre, "05", "O", "P", creditos, 0, false, ""
+            };
+            TablaCursos.addRow(fila);
+            orden++;
         }
     }
+    
+    //version con creditos y codigo
+//    private void cargarCursosEnTabla() {
+//        TablaCursos.setRowCount(0);
+//        int orden = 0;
+//        for (CURSO c : cursos) {
+//            String nombre = "";
+//            String codigo = "";
+//            int creditos = 0;
+//            if (c.getNombrecurso() != null) {
+//                nombre = c.getNombrecurso();
+//                codigo = c.getCodigo();
+//                creditos = c.getCredito();
+//            }
+//            Object[] fila = new Object[]{orden, codigo, nombre, "05", "O", "P", creditos, 0, false, ""};
+//            TablaCursos.addRow(fila);
+//            orden++;
+//        }
+//
+//    }
 
     private void seleccionarFilaTabla() {
         int filaSeleccionada = jTable1.getSelectedRow();
@@ -391,13 +403,7 @@ public class PnlMatricula extends javax.swing.JPanel {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {},
-                {},
-                {},
-                {},
-                {},
-                {},
-                {}
+
             },
             new String [] {
 
