@@ -95,19 +95,8 @@ public class PnlMatricula extends javax.swing.JPanel {
                 codigo = "ESSIO14";
                 creditos = 3;
             }
-
             Object[] fila = new Object[]{
-                (i + 1),               // N°
-                codigo,                // Código asignado
-                nombreBD,              // Nombre tal cual está registrado en tu BD
-                "05",                  // Ciclo
-                "O",                   // Tipo
-                "P",                   // Estado
-                creditos,              // Créditos
-                0,                     // NV
-                false,                 // Checkbox
-                ""                     // Grupo
-            };
+                (i + 1),codigo,nombreBD,"05","O","P",creditos,0,false,""};
             TablaCursos.addRow(fila);
         }
     }
