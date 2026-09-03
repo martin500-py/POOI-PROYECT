@@ -1,4 +1,5 @@
 package FORM02_PANEL_PRICIPAL_ESTUDIANTES;
+
 import BASE_DE_dATOS.CLASS_MAIN_CAPTURA;
 import CLASESCURSO_DETALLECLASE.CURSO;
 import CLASESCURSO_DETALLECLASE.MATRICULA;
@@ -22,23 +23,23 @@ import javax.swing.JPanel;
 public class PANEL02_PRINCIPAL_ESTUDIANTES extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PANEL02_PRINCIPAL_ESTUDIANTES.class.getName());
-    CLASS_MAIN_CAPTURA bd=new CLASS_MAIN_CAPTURA();
-    ALUMNO a=new ALUMNO();//Esto es nuevo
-    
+    CLASS_MAIN_CAPTURA bd = new CLASS_MAIN_CAPTURA();
+    ALUMNO a = new ALUMNO();//Esto es nuevo
+
     ArrayList<ALUMNO> alumnos;
     ArrayList<DOCENTE> docentes;
     ArrayList<CURSO> cursos;
     ArrayList<MATRICULA> matricula;
-   
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///Esto es nuevo 
     
     public PANEL02_PRINCIPAL_ESTUDIANTES() {
-    initComponents();
-    subirImagenes();
+        initComponents();
+        subirImagenes();
     }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     public PANEL02_PRINCIPAL_ESTUDIANTES(ALUMNO a) {
@@ -49,24 +50,24 @@ public class PANEL02_PRINCIPAL_ESTUDIANTES extends javax.swing.JFrame {
         this.setMinimumSize(new java.awt.Dimension(900, 550));
         this.setLocationRelativeTo(null);
         mostrarPanel(new PnlInicio(a));
-        
+
         //////////////////////////////////
         //////////////////////////////////
         ///Esto es nuevo
         bd.prepararbasededatos();
-        this.a=a;
+        this.a = a;
         descargar();
         //////////////////////////////////
         //////////////////////////////////
         ///COMPRUEBO QUE CARGARON CURSOS Y DOCENTES 
-        JOptionPane.showMessageDialog(null, "tamanio curso "+cursos.size());
-        JOptionPane.showMessageDialog(null, "tamanio docentes "+docentes.size());
-        JOptionPane.showMessageDialog(null, "tamanio matricula "+matricula.size());
-        JOptionPane.showMessageDialog(null, "El curso "+cursos.get(0).getNombrecurso()+" lo enseña "+cursos.get(0).getDocente().getNombre_completo());
+        JOptionPane.showMessageDialog(null, "tamanio curso " + cursos.size());
+        JOptionPane.showMessageDialog(null, "tamanio docentes " + docentes.size());
+        JOptionPane.showMessageDialog(null, "tamanio matricula " + matricula.size());
+        JOptionPane.showMessageDialog(null, "El curso " + cursos.get(0).getNombrecurso() + " lo enseña " + cursos.get(0).getDocente().getNombre_completo());
 
     }
-    
-    void subirImagenes(){
+
+    void subirImagenes() {
         setImagenEscalada(lblLogo, "/IMAGENES/logoUnu.png", 70, 70);
         setImagenEscalada(lblCasa, "/IMAGENES/casa.png", 45, 45);
         setImagenEscalada(lblMatricula, "/IMAGENES/Matricula.png", 45, 45);
@@ -82,22 +83,24 @@ public class PANEL02_PRINCIPAL_ESTUDIANTES extends javax.swing.JFrame {
         aplicarEfectoHover(btnApuntes);
         aplicarEfectoHover(btnCerrar);
     }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void descargar(){
-        docentes=bd.getarraydocente();
-        cursos=bd.getarraycurso();
-        matricula=bd.getarraymatricula();
+    void descargar() {
+        docentes = bd.getarraydocente();
+        cursos = bd.getarraycurso();
+        matricula = bd.getarraymatricula();
         lblcodigo.setText(a.getCodigo());
         lblusuario.setText(a.getNombre_completo());
     }
-    
-    void cargar(){
+
+    void cargar() {
         bd.setarraydocente(docentes);
         bd.setarraycurso(cursos);
-        
+
     }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,8 +115,8 @@ public class PANEL02_PRINCIPAL_ESTUDIANTES extends javax.swing.JFrame {
     }
 
     public void aplicarEfectoHover(JButton boton) {
-        Color colorBase = new Color(15, 66, 45);   
-        Color colorHover = new Color(27, 85, 60);   
+        Color colorBase = new Color(15, 66, 45);
+        Color colorHover = new Color(27, 85, 60);
 
         boton.setContentAreaFilled(false);
         boton.setOpaque(true);
@@ -338,15 +341,15 @@ public class PANEL02_PRINCIPAL_ESTUDIANTES extends javax.swing.JFrame {
     }//GEN-LAST:event_btnInicioMouseEntered
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-                                              
-    int confirmar = JOptionPane.showConfirmDialog(this, 
-            "¿Estás seguro de que deseas cerrar sesión?", 
-            "Cerrar Sesión", 
-            JOptionPane.YES_NO_OPTION);
 
-    if (confirmar == JOptionPane.YES_OPTION) {
-        this.dispose();
-    }
+        int confirmar = JOptionPane.showConfirmDialog(this,
+                "¿Estás seguro de que deseas cerrar sesión?",
+                "Cerrar Sesión",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmar == JOptionPane.YES_OPTION) {
+            this.dispose();
+        }
 
     }//GEN-LAST:event_btnCerrarActionPerformed
 

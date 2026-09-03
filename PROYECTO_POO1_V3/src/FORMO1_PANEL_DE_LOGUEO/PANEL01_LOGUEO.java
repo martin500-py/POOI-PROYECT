@@ -45,6 +45,7 @@ public class PANEL01_LOGUEO extends javax.swing.JFrame {
 
         JOptionPane.showMessageDialog(null, "tamanio alumnos " + alumnos.size());
         JOptionPane.showMessageDialog(null, "tamanio deocentes " + docentes.size());
+        JOptionPane.showMessageDialog(null, "tamanio curso " + cursos.size());
 
     }
 
@@ -52,6 +53,7 @@ public class PANEL01_LOGUEO extends javax.swing.JFrame {
        void descargar() {
         docentes = bd.getarraydocente();
         alumnos = bd.getarrayalumno();
+        cursos = bd.getarraycurso();
     }
 
     void cargar() {
@@ -251,7 +253,6 @@ public class PANEL01_LOGUEO extends javax.swing.JFrame {
 
     private void btnDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDocenteActionPerformed
         txtcod.setText("CODIGO DE DOCENTE");
-
         escoge = false;
         limpiar();
     }//GEN-LAST:event_btnDocenteActionPerformed

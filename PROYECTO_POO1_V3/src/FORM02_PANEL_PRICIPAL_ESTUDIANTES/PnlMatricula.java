@@ -25,6 +25,7 @@ public class PnlMatricula extends javax.swing.JPanel {
         this.a = a;
         TablaCursos = (DefaultTableModel) jTable1.getModel();
         btnMatricular.setEnabled(false);
+        descargar();
         CargarDatosAlumnos();
         inicializarTabla();
         cargarCursosEnTabla();
@@ -36,13 +37,15 @@ public class PnlMatricula extends javax.swing.JPanel {
 
     void descargar() {
         matricula = bd.getarraymatricula();
+        cursos = bd.getarraycurso();
     }
 
     void CargarDatosAlumnos() {
-        if (a != null) {
-            lbldatosalumno.setText("ALUMNO: " + a.getCodigo() + " - " + a.getNombre_completo());
+        if (a != null && a.getCodigo() != null) {
+            lbldatosalumno.setText(" " + a.getCodigo() + " - " + a.getNombre_completo());
+        } else {
+            lbldatosalumno.setText(" null");
         }
-
     }
 
     private void inicializarTabla() {
@@ -60,111 +63,88 @@ public class PnlMatricula extends javax.swing.JPanel {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 8) {
+                if (columnIndex == 7) {
                     return Boolean.class;
                 }
                 return super.getColumnClass(columnIndex);
             }
         };
+
         jTable1.setModel(TablaCursos);
+
+        int[] anchos = {40, 90, 210, 55, 45, 45, 45, 35, 65};
+        for (int i = 0; i < anchos.length; i++) {
+            jTable1.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+        }
     }
 
     private void cargarCursosEnTabla() {
         TablaCursos.setRowCount(0);
-        int orden = 1;
 
+        if (cursos == null || cursos.isEmpty()) {
+            return;
+        }
+        int orden = 1;
         for (CURSO c : cursos) {
-            String nombre = "";
+            String codigo;
+            if (c.getCodigo() != null) {
+                codigo = c.getCodigo();
+            } else {
+                codigo = "";
+            }
+            String nombre;
             if (c.getNombrecurso() != null) {
                 nombre = c.getNombrecurso();
+            } else {
+                nombre = "";
             }
-            String codigo = "COD00" + orden;
-            int creditos = 0;
-            if (orden == 1) {
-                creditos = 4;
-            } else if (orden == 2) {
-                creditos = 3;
-            } else if (orden == 3) {
-                creditos = 2;
-            } else if (orden == 4) {
-                creditos = 4;
-            } else if (orden == 5) {
-                creditos = 3;
-            }
-            Object[] fila = new Object[]{
-                orden, codigo, nombre, "05", "O", "P", creditos, 0, false, ""
-            };
+            int creditos = c.getCredito();
+            Object[] fila = new Object[]{orden, codigo, nombre, "05", "P", creditos, 0, false, ""};
             TablaCursos.addRow(fila);
             orden++;
         }
     }
-    
-    //version con creditos y codigo
-//    private void cargarCursosEnTabla() {
-//        TablaCursos.setRowCount(0);
-//        int orden = 0;
-//        for (CURSO c : cursos) {
-//            String nombre = "";
-//            String codigo = "";
-//            int creditos = 0;
-//            if (c.getNombrecurso() != null) {
-//                nombre = c.getNombrecurso();
-//                codigo = c.getCodigo();
-//                creditos = c.getCredito();
-//            }
-//            Object[] fila = new Object[]{orden, codigo, nombre, "05", "O", "P", creditos, 0, false, ""};
-//            TablaCursos.addRow(fila);
-//            orden++;
-//        }
-//
-//    }
 
     private void seleccionarFilaTabla() {
         int filaSeleccionada = jTable1.getSelectedRow();
         if (filaSeleccionada != -1) {
 
-            Object estadoObj = jTable1.getValueAt(filaSeleccionada, 5);
-            Object checkObj = jTable1.getValueAt(filaSeleccionada, 8);
+            Object estadoObj = jTable1.getValueAt(filaSeleccionada, 4);
+            Object checkObj = jTable1.getValueAt(filaSeleccionada, 7);
 
             String estado = "";
             if (estadoObj != null) {
                 estado = estadoObj.toString();
             }
-
             boolean estaCheck = false;
             if (checkObj instanceof Boolean) {
                 estaCheck = (Boolean) checkObj;
             }
-
             Object valorN = jTable1.getValueAt(filaSeleccionada, 0);
             if (valorN != null) {
                 txtN.setText(valorN.toString());
             } else {
                 txtN.setText("");
             }
-
             Object valorCodigo = jTable1.getValueAt(filaSeleccionada, 1);
             if (valorCodigo != null) {
                 txtCodigo.setText(valorCodigo.toString());
             } else {
                 txtCodigo.setText("");
             }
-
             Object valorCurso = jTable1.getValueAt(filaSeleccionada, 2);
             if (valorCurso != null) {
                 txtCurso.setText(valorCurso.toString());
             } else {
                 txtCurso.setText("");
             }
-
-            Object valorCR = jTable1.getValueAt(filaSeleccionada, 6);
+            Object valorCR = jTable1.getValueAt(filaSeleccionada, 5);
             if (valorCR != null) {
                 txtCR.setText(valorCR.toString());
             } else {
                 txtCR.setText("");
             }
-
-            Object valorGrupo = jTable1.getValueAt(filaSeleccionada, 9);
+            Object valorGrupo = jTable1.getValueAt(filaSeleccionada, 8);
             if (valorGrupo != null && !valorGrupo.toString().trim().isEmpty()) {
                 cboGrupo.setSelectedItem(valorGrupo.toString().trim());
             } else {
@@ -434,6 +414,7 @@ public class PnlMatricula extends javax.swing.JPanel {
 
         cboGrupo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "A", "B" }));
         cboGrupo.setBorder(javax.swing.BorderFactory.createTitledBorder("Grupo"));
+        cboGrupo.addActionListener(this::cboGrupoActionPerformed);
 
         btnMatricular.setBackground(new java.awt.Color(15, 66, 45));
         btnMatricular.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -468,16 +449,19 @@ public class PnlMatricula extends javax.swing.JPanel {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtCR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(cboGrupo, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnMatricular, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(80, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtCR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnMatricular, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(cboGrupo, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7)))
+                .addContainerGap(73, Short.MAX_VALUE))
         );
 
         jPanel7.add(jPanel8, java.awt.BorderLayout.CENTER);
@@ -516,22 +500,17 @@ public class PnlMatricula extends javax.swing.JPanel {
             javax.swing.JOptionPane.showMessageDialog(this, "Por favor, selecciona un curso de la tabla.");
             return;
         }
-
         if (cboGrupo.getSelectedIndex() == 0) {
             javax.swing.JOptionPane.showMessageDialog(this, "Selecciona un grupo válido (A o B).");
             return;
         }
-
         String grupoSeleccionado = cboGrupo.getSelectedItem().toString();
-
-        jTable1.setValueAt("M", filaSeleccionada, 5);
-        jTable1.setValueAt(true, filaSeleccionada, 8);
-        jTable1.setValueAt(grupoSeleccionado, filaSeleccionada, 9);
-
+        jTable1.setValueAt("M", filaSeleccionada, 4);
+        jTable1.setValueAt(true, filaSeleccionada, 7);
+        jTable1.setValueAt(grupoSeleccionado, filaSeleccionada, 8);
         if (matricula == null) {
             matricula = new ArrayList<>();
         }
-
         MATRICULA m = new MATRICULA();
         m.setAlumno(a);
         if (cursos != null && filaSeleccionada < cursos.size()) {
@@ -540,27 +519,30 @@ public class PnlMatricula extends javax.swing.JPanel {
         m.setCiclorelativo("V");
         m.setEstado("En Curso");
         try {
-            Object crObj = jTable1.getValueAt(filaSeleccionada, 6);
+            Object crObj = jTable1.getValueAt(filaSeleccionada, 5);
             if (crObj != null) {
                 m.setCreditos(Integer.parseInt(crObj.toString()));
             }
         } catch (Exception ex) {
             m.setCreditos(3);
         }
-
         matricula.add(m);
+        System.out.println("antes");
         bd.setarraymatricula(matricula);
-
+        System.out.println("despues");
         JOptionPane.showMessageDialog(this, "Curso matriculado correctamente.");
         btnMatricular.setEnabled(false);
         limpiarCampos();
-
     }//GEN-LAST:event_btnMatricularActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
         seleccionarFilaTabla();
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void cboGrupoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboGrupoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cboGrupoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

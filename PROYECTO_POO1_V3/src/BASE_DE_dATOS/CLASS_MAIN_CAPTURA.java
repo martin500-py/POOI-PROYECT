@@ -132,7 +132,6 @@ public class CLASS_MAIN_CAPTURA {
             st = con.createStatement();
             ResultSet rs = st.executeQuery("Select *from alumnos");
             while (rs.next()) {
-
                 ALUMNO a = new ALUMNO(rs.getString("Direccion"), rs.getInt("Creditos"), rs.getString("Codigo"), rs.getString("Password"), rs.getString("Dni"), rs.getString("NombreCompleto"), rs.getString("Telefono"), rs.getString("CorreoInstitucional"));
                 alumnos.add(a);
             }
@@ -219,7 +218,7 @@ public class CLASS_MAIN_CAPTURA {
         cursos.clear();
         try {
             st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select c.NombreCurso,d.Codigo,d.NombreCompleto,d.Dni,d.CorreoInstitucional,d.Telefono,"
+            ResultSet rs = st.executeQuery("Select c.NombreCurso,c.codigo,c.credito,d.Codigo,d.NombreCompleto,d.Dni,d.CorreoInstitucional,d.Telefono,"
                     + "d.Contraseña from cursos c inner join docentes d on d.DocenteID=c.DocenteID");
 
             while (rs.next()) {
@@ -240,7 +239,7 @@ public class CLASS_MAIN_CAPTURA {
 
     public void setarraycurso(ArrayList<CURSO> listaCursos) {
         String sqlBuscar = "SELECT NombreCurso FROM cursos WHERE NombreCurso = ?";
-        String sqlInsert = "INSERT INTO cursos (NombreCurso, DocenteID) VALUES (?, (SELECT DocenteID FROM docentes WHERE Codigo = ?))";
+        String sqlInsert = "INSERT INTO cursos (NombreCurso, DocenteID,codigo,credito) VALUES (?, (SELECT DocenteID FROM docentes WHERE Codigo = ?))";
         String sqlUpdate = "UPDATE cursos SET DocenteID = (SELECT DocenteID FROM docentes WHERE Codigo = ?) WHERE NombreCurso = ?";
 
         try {
@@ -250,12 +249,9 @@ public class CLASS_MAIN_CAPTURA {
             PreparedStatement pstUpdate = con.prepareStatement(sqlUpdate);
 
             for (CURSO c : listaCursos) {
-
                 pstBuscar.setString(1, c.getNombrecurso());
                 ResultSet rs = pstBuscar.executeQuery();
-
                 if (rs.next()) {
-
                     pstUpdate.setString(1, c.getDocente().getCodigo());
                     pstUpdate.setString(2, c.getNombrecurso());
                     pstUpdate.executeUpdate();
@@ -294,7 +290,7 @@ public class CLASS_MAIN_CAPTURA {
                 + "m.CicloRelativo, m.CreditosCiclo, m.PromedioPracticas, m.ExamenParcial, m.ExamenFinal, m.NotaFinal, m.Estado, "
                 + "d.Codigo AS CodigoDocente, d.NombreCompleto AS NombreDocente, d.Dni AS DniDocente, "
                 + "d.CorreoInstitucional AS CorreoDocente, d.Telefono AS TelefonoDocente, d.Contraseña AS PassDocente, "
-                + "c.NombreCurso, "
+                + "c.NombreCurso,c.codigo AS CodigoCurso, c.credito AS CreditosCurso, "
                 + "a.NombreCompleto AS NombreAlumno, a.Codigo AS CodigoAlumno, a.Dni AS DniAlumno, "
                 + "a.CorreoInstitucional AS CorreoAlumno, a.Telefono AS TelefonoAlumno, a.Direccion, a.Creditos, a.Password AS PassAlumno "
                 + "FROM matricula m "
@@ -329,7 +325,7 @@ public class CLASS_MAIN_CAPTURA {
                         rs.getString("CorreoDocente")
                 );
 
-                CURSO cu = new CURSO(docente, rs.getString("NombreCurso"), rs.getString("codigo"),rs.getInt("credito"));
+                CURSO cu = new CURSO(docente, rs.getString("NombreCurso"), rs.getString("CodigoCurso"),rs.getInt("CreditosCurso"));
 
                 MATRICULA m = new MATRICULA(
                         alumno,
@@ -357,7 +353,6 @@ public class CLASS_MAIN_CAPTURA {
     }
 
     public void setarraymatricula(ArrayList<MATRICULA> matri) {
-
         String sqlbuscar = "SELECT m.MatriculaID FROM matricula m "
                 + "INNER JOIN alumnos a ON a.AlumnoID = m.AlumnoID "
                 + "INNER JOIN cursos c ON c.CursoID = m.CursoID "
@@ -373,15 +368,11 @@ public class CLASS_MAIN_CAPTURA {
             PreparedStatement pstbuscar = con.prepareStatement(sqlbuscar);
             PreparedStatement pstinsertar = con.prepareStatement(sqlinser);
             PreparedStatement pstupdate = con.prepareStatement(sqlupdate);
-
             for (MATRICULA m : matri) {
-
                 pstbuscar.setString(1, m.getAlumno().getCodigo());
                 pstbuscar.setString(2, m.getCurso().getNombrecurso());
                 ResultSet rs = pstbuscar.executeQuery();
-
                 if (rs.next()) {
-
                     pstupdate.setString(1, m.getCiclorelativo());
                     pstupdate.setInt(2, m.getCreditos());
                     pstupdate.setDouble(3, m.getPp());
@@ -389,16 +380,12 @@ public class CLASS_MAIN_CAPTURA {
                     pstupdate.setDouble(5, m.getEf());
                     pstupdate.setDouble(6, m.getNotafinal());
                     pstupdate.setString(7, m.getEstado());
-
                     pstupdate.setString(8, m.getAlumno().getCodigo());
                     pstupdate.setString(9, m.getCurso().getNombrecurso());
-
                     pstupdate.executeUpdate();
-
                 } else {
                     pstinsertar.setString(1, m.getAlumno().getCodigo());
                     pstinsertar.setString(2, m.getCurso().getNombrecurso());
-
                     pstinsertar.setString(3, m.getCiclorelativo());
                     pstinsertar.setInt(4, m.getCreditos());
                     pstinsertar.setDouble(5, m.getPp());
@@ -406,17 +393,13 @@ public class CLASS_MAIN_CAPTURA {
                     pstinsertar.setDouble(7, m.getEf());
                     pstinsertar.setDouble(8, m.getNotafinal());
                     pstinsertar.setString(9, m.getEstado());
-
                     pstinsertar.executeUpdate();
                 }
-
                 rs.close();
             }
-
             pstbuscar.close();
             pstinsertar.close();
             pstupdate.close();
-
         } catch (Exception e) {
             System.out.println("Error no cargo arraymatricula");
         }
