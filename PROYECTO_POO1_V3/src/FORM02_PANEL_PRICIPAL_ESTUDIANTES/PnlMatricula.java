@@ -20,19 +20,9 @@ public class PnlMatricula extends javax.swing.JPanel {
     public PnlMatricula(ArrayList<CURSO> cursos, ArrayList<MATRICULA> matricula, ALUMNO a) {
         initComponents();
 
-        this.a = a;
         this.cursos = cursos;
         this.matricula = matricula;
-
-        // Si la lista de cursos llega vacía, la traemos de la base de datos
-        if (this.cursos == null) {
-            this.cursos = bd.getarraycurso();
-        }
-
-        // Si la lista de matrícula llega vacía, la traemos de la base de datos
-        if (this.matricula == null) {
-            this.matricula = bd.getarraymatricula();
-        }
+        this.a = a;
 
         TablaCursos = (DefaultTableModel) jTable1.getModel();
         btnMatricular.setEnabled(false);
@@ -81,86 +71,23 @@ public class PnlMatricula extends javax.swing.JPanel {
     }
 
     private void cargarCursosEnTabla() {
-        // 1. Limpiamos la tabla antes de cargar
         TablaCursos.setRowCount(0);
 
-        // 2. Si la lista de cursos no tiene datos, los traemos de la base de datos
-        if (cursos == null) {
-            cursos = bd.getarraycurso();
-        }
-
-        // 3. Recorremos el ArrayList de cursos uno por uno
         for (int i = 0; i < cursos.size(); i++) {
-            
-            // Obtenemos el curso actual del ArrayList
-            CURSO cursoActual = cursos.get(i);
-            String nombreCurso = cursoActual.getNombrecurso();
+            CURSO c = cursos.get(i);
 
-            // Valores por defecto
-            String codigoCurso = "CUR0" + (i + 1);
-            int creditos = 4;
-
-            // Asignamos código y créditos según el nombre del curso
-            if (nombreCurso.contains("TECNOLOGIAS DE LAS INFORMACIONES")) {
-                codigoCurso = "EGTIC10";
-                creditos = 1;
-            } else if (nombreCurso.contains("INGLES")) {
-                codigoCurso = "EGING13";
-                creditos = 1;
-            } else if (nombreCurso.contains("RESPONSABILIDAD SOCIAL")) {
-                codigoCurso = "EERS011";
-                creditos = 2;
-            } else if (nombreCurso.contains("SISTEMAS DIGITALES")) {
-                codigoCurso = "EESDI13";
-                creditos = 3;
-            } else if (nombreCurso.contains("INVESTIGACION DE OPERACIONES")) {
-                codigoCurso = "EEIDO14";
-                creditos = 4;
-            } else if (nombreCurso.contains("PROGRAMACION ORIENTADA A OBJETOS")) {
-                codigoCurso = "ESPOO07";
-                creditos = 4;
-            } else if (nombreCurso.contains("ANALISIS DE SISTEMAS")) {
-                codigoCurso = "ESADS08";
-                creditos = 3;
-            } else if (nombreCurso.contains("BASE DE DATOS")) {
-                codigoCurso = "ESBDD09";
-                creditos = 3;
-            }
-
-            // Verificamos si el alumno ya se encuentra matriculado en este curso
-            String estado = "P";
-            boolean matriculado = false;
-            String grupo = "";
-
-            if (matricula != null && a != null) {
-                for (int j = 0; j < matricula.size(); j++) {
-                    MATRICULA m = matricula.get(j);
-                    if (m.getAlumno() != null && m.getCurso() != null) {
-                        if (m.getAlumno().getCodigo().equals(a.getCodigo())) {
-                            if (m.getCurso().getNombrecurso().equalsIgnoreCase(nombreCurso)) {
-                                estado = "M";
-                                matriculado = true;
-                                grupo = "A";
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 4. Creamos la fila elemento por elemento
-            Object[] fila = new Object[10];
-            fila[0] = (i + 1);          // N°
-            fila[1] = codigoCurso;      // CODIGO
-            fila[2] = nombreCurso;      // NOMBRE CURSO
-            fila[3] = "05";             // CICLO
-            fila[4] = "O";              // TIPO
-            fila[5] = estado;           // EST (P = Pendiente, M = Matriculado)
-            fila[6] = creditos;         // NC (Créditos)
-            fila[7] = 0;                // NV (Veces llevado)
-            fila[8] = matriculado;      // * (Checkbox)
-            fila[9] = grupo;            // GRUPO
-
-            // 5. Subimos la fila a la tabla
+            Object[] fila = new Object[]{
+                (i + 1),
+                "000" + (i + 1),
+                c.getNombrecurso(),
+                "05",
+                "O",
+                "P",
+                4,
+                0,
+                false,
+                ""
+            };
             TablaCursos.addRow(fila);
         }
     }
