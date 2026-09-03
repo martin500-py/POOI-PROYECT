@@ -15,6 +15,7 @@ public class PnlMatricula extends javax.swing.JPanel {
     ArrayList<MATRICULA> matricula;
     ArrayList<CURSO> cursos;
     ALUMNO a;
+
     private DefaultTableModel TablaCursos;
 
     public PnlMatricula(ArrayList<CURSO> cursos, ArrayList<MATRICULA> matricula, ALUMNO a) {
@@ -69,35 +70,40 @@ public class PnlMatricula extends javax.swing.JPanel {
 
     private void cargarCursosEnTabla() {
         TablaCursos.setRowCount(0);
+        if (cursos == null) {
+            cursos = bd.getarraycurso();
+        }
 
-        for (int i = 0; i < cursos.size(); i++) {
-            CURSO c = cursos.get(i);
-            String nombreBD = (c.getNombrecurso() != null) ? c.getNombrecurso().trim() : "";
-            String nombreMayus = nombreBD.toUpperCase();
+        if (cursos != null) {
+            for (int i = 0; i < cursos.size(); i++) {
+                CURSO c = cursos.get(i);
+                String nombre = c.getNombrecurso();
 
-            String codigo = "";
-            int creditos = 4;
+                String codigo = "";
+                int creditos = 0;
 
-            // Detectamos el curso según el nombre registrado en la base de datos
-            if (nombreMayus.contains("ORIENT") || nombreMayus.contains("OBJETO") || nombreMayus.contains("POO")) {
-                codigo = "ESPOO07";
-                creditos = 4;
-            } else if (nombreMayus.contains("BASE DE DATO")) {
-                codigo = "ESBDD09";
-                creditos = 3;
-            } else if (nombreMayus.contains("DISCRETA")) {
-                codigo = "EEMD005";
-                creditos = 2;
-            } else if (nombreMayus.contains("ESTRUCTURA")) {
-                codigo = "ESEDA04";
-                creditos = 4;
-            } else if (nombreMayus.contains("OPERATIVO")) {
-                codigo = "ESSIO14";
-                creditos = 3;
+                if (nombre.equalsIgnoreCase("Programación Orientada a Objetos")) {
+                    codigo = "ESPOO07";
+                    creditos = 4;
+                } else if (nombre.equalsIgnoreCase("Base de Datos I")) {
+                    codigo = "ESBDD09";
+                    creditos = 3;
+                } else if (nombre.equalsIgnoreCase("Matemática Discreta")) {
+                    codigo = "EEMD005";
+                    creditos = 2;
+                } else if (nombre.equalsIgnoreCase("Estructura de Datos")) {
+                    codigo = "ESEDA04";
+                    creditos = 4;
+                } else if (nombre.equalsIgnoreCase("Sistemas Operativos")) {
+                    codigo = "ESSIO14";
+                    creditos = 3;
+                }
+
+                Object[] fila = new Object[]{
+                    (i + 1), codigo, nombre, "05", "O", "P", creditos, 0, false, ""
+                };
+                TablaCursos.addRow(fila);
             }
-            Object[] fila = new Object[]{
-                (i + 1),codigo,nombreBD,"05","O","P",creditos,0,false,""};
-            TablaCursos.addRow(fila);
         }
     }
 
