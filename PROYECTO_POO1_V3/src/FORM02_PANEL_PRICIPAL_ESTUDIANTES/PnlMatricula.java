@@ -19,14 +19,25 @@ public class PnlMatricula extends javax.swing.JPanel {
 
     public PnlMatricula(ArrayList<CURSO> cursos, ArrayList<MATRICULA> matricula, ALUMNO a) {
         initComponents();
-        this.matricula = (matricula != null) ? matricula : bd.getarraymatricula();
-        this.cursos = (cursos != null && !cursos.isEmpty()) ? cursos : bd.getarraycurso();
+
         this.a = a;
-//        cargarAlumno();
+        this.cursos = cursos;
+        this.matricula = matricula;
+
+        // Si la lista de cursos llega vacía, la traemos de la base de datos
+        if (this.cursos == null) {
+            this.cursos = bd.getarraycurso();
+        }
+
+        // Si la lista de matrícula llega vacía, la traemos de la base de datos
+        if (this.matricula == null) {
+            this.matricula = bd.getarraymatricula();
+        }
+
         TablaCursos = (DefaultTableModel) jTable1.getModel();
         btnMatricular.setEnabled(false);
+
         CargarDatosAlumnos();
-//        CargarDatosFicha();
         inicializarTabla();
         cargarCursosEnTabla();
     }
@@ -39,39 +50,17 @@ public class PnlMatricula extends javax.swing.JPanel {
         matricula = bd.getarraymatricula();
     }
 
-//    void cargarAlumno() {
-//        lbldatosalumno.setText(a.getCodigo() + " " + a.getNombre_completo());
-//    }
-    void cargarCursos() {
-        if (cursos != null && !cursos.isEmpty()) {
-            cursos.get(0).getNombrecurso();
-        }
-    }
-
     void CargarDatosAlumnos() {
         if (a != null) {
             lbldatosalumno.setText("ALUMNO: " + a.getCodigo() + " - " + a.getNombre_completo());
-        } //else {
-//        lbldatosalumno.setText(" 0002123323 - ALUMNO DE PRUEBA");
-//    }
+        }
     }
 
-//    void CargarDatosFicha() {
-//    lblFecha.setText("Fecha: " + fechaActual);
-//        lblNroFicha.setText("0000-212-3323-2933");
-//    lblPromedioPonderado.setText(" 14.50");
-//        lblOrdenMatricula.setText("Orden de Matrícula: 1");
-//    lblMaxCursos.setText("N° Máximo de Cursos: 7");
-//        lblCreditosAprobados.setText("Creditos Aprobados: 110");
-//        lblCreditosMatricular.setText("Creditos a Matricular: 0");
-//        lblCursosMatricular.setText("Cursos a Matricular: 0");
-//    lblMaxCreditos.setText("N° Máximo de Creditos: 22");
-//        lblCicloRelativo.setText("Ciclo Relativo: V");
-//    }
     private void inicializarTabla() {
         String[] columnas = {
             "N°", "CODIGO", "NOMBRE CURSO", "CICLO", "TIPO",
-            "EST", "NC", "NV", "*", "GRUPO"};
+            "EST", "NC", "NV", "*", "GRUPO"
+        };
 
         jTable1.getTableHeader().setReorderingAllowed(false);
         TablaCursos = new DefaultTableModel(columnas, 0) {
@@ -92,67 +81,87 @@ public class PnlMatricula extends javax.swing.JPanel {
     }
 
     private void cargarCursosEnTabla() {
+        // 1. Limpiamos la tabla antes de cargar
         TablaCursos.setRowCount(0);
-        if (cursos == null || cursos.isEmpty()) {
+
+        // 2. Si la lista de cursos no tiene datos, los traemos de la base de datos
+        if (cursos == null) {
             cursos = bd.getarraycurso();
         }
-        System.out.println("Cantidad de cursos recibidos: " + (cursos != null ? cursos.size() : "es null"));
-        if (cursos != null) {
-            for (int i = 0; i < cursos.size(); i++) {
-                CURSO c = cursos.get(i);
-                String nombre = (c.getNombrecurso() != null) ? c.getNombrecurso().trim().toUpperCase() : "";
-                String codigo = "CUR" + String.format("%03d", (i + 1));
-                int creditos = 4;
 
-                if (nombre.contains("TECNOLOGIAS DE LAS INFORMACIONES")) {
-                    codigo = "EGTIC10";
-                    creditos = 1;
-                } else if (nombre.contains("INGLES")) {
-                    codigo = "EGING13";
-                    creditos = 1;
-                } else if (nombre.contains("RESPONSABILIDAD SOCIAL")) {
-                    codigo = "EERS011";
-                    creditos = 2;
-                } else if (nombre.contains("SISTEMAS DIGITALES")) {
-                    codigo = "EESDI13";
-                    creditos = 3;
-                } else if (nombre.contains("INVESTIGACION DE OPERACIONES")) {
-                    codigo = "EEIDO14";
-                    creditos = 4;
-                } else if (nombre.contains("PROGRAMACION ORIENTADA A OBJETOS")) {
-                    codigo = "ESPOO07";
-                    creditos = 4;
-                } else if (nombre.contains("ANALISIS DE SISTEMAS")) {
-                    codigo = "ESADS08";
-                    creditos = 3;
-                } else if (nombre.contains("BASE DE DATOS")) {
-                    codigo = "ESBDD09";
-                    creditos = 3;
-                }
+        // 3. Recorremos el ArrayList de cursos uno por uno
+        for (int i = 0; i < cursos.size(); i++) {
+            
+            // Obtenemos el curso actual del ArrayList
+            CURSO cursoActual = cursos.get(i);
+            String nombreCurso = cursoActual.getNombrecurso();
 
-                String estado = "P";
-                boolean yaMatriculado = false;
-                String grupo = "";
+            // Valores por defecto
+            String codigoCurso = "CUR0" + (i + 1);
+            int creditos = 4;
 
-                if (matricula != null && a != null) {
-                    for (MATRICULA m : matricula) {
-                        if (m.getAlumno() != null && m.getCurso() != null
-                                && m.getAlumno().getCodigo() != null
-                                && m.getAlumno().getCodigo().equals(a.getCodigo())
-                                && m.getCurso().getNombrecurso() != null
-                                && m.getCurso().getNombrecurso().equalsIgnoreCase(c.getNombrecurso())) {
-                            estado = "M";
-                            yaMatriculado = true;
-                            grupo = "A";
-                            break;
+            // Asignamos código y créditos según el nombre del curso
+            if (nombreCurso.contains("TECNOLOGIAS DE LAS INFORMACIONES")) {
+                codigoCurso = "EGTIC10";
+                creditos = 1;
+            } else if (nombreCurso.contains("INGLES")) {
+                codigoCurso = "EGING13";
+                creditos = 1;
+            } else if (nombreCurso.contains("RESPONSABILIDAD SOCIAL")) {
+                codigoCurso = "EERS011";
+                creditos = 2;
+            } else if (nombreCurso.contains("SISTEMAS DIGITALES")) {
+                codigoCurso = "EESDI13";
+                creditos = 3;
+            } else if (nombreCurso.contains("INVESTIGACION DE OPERACIONES")) {
+                codigoCurso = "EEIDO14";
+                creditos = 4;
+            } else if (nombreCurso.contains("PROGRAMACION ORIENTADA A OBJETOS")) {
+                codigoCurso = "ESPOO07";
+                creditos = 4;
+            } else if (nombreCurso.contains("ANALISIS DE SISTEMAS")) {
+                codigoCurso = "ESADS08";
+                creditos = 3;
+            } else if (nombreCurso.contains("BASE DE DATOS")) {
+                codigoCurso = "ESBDD09";
+                creditos = 3;
+            }
+
+            // Verificamos si el alumno ya se encuentra matriculado en este curso
+            String estado = "P";
+            boolean matriculado = false;
+            String grupo = "";
+
+            if (matricula != null && a != null) {
+                for (int j = 0; j < matricula.size(); j++) {
+                    MATRICULA m = matricula.get(j);
+                    if (m.getAlumno() != null && m.getCurso() != null) {
+                        if (m.getAlumno().getCodigo().equals(a.getCodigo())) {
+                            if (m.getCurso().getNombrecurso().equalsIgnoreCase(nombreCurso)) {
+                                estado = "M";
+                                matriculado = true;
+                                grupo = "A";
+                            }
                         }
                     }
                 }
-
-                Object[] fila = new Object[]{
-                    (i + 1), codigo, c.getNombrecurso(), "05", "O", estado, creditos, 0, yaMatriculado, grupo};
-                TablaCursos.addRow(fila);
             }
+
+            // 4. Creamos la fila elemento por elemento
+            Object[] fila = new Object[10];
+            fila[0] = (i + 1);          // N°
+            fila[1] = codigoCurso;      // CODIGO
+            fila[2] = nombreCurso;      // NOMBRE CURSO
+            fila[3] = "05";             // CICLO
+            fila[4] = "O";              // TIPO
+            fila[5] = estado;           // EST (P = Pendiente, M = Matriculado)
+            fila[6] = creditos;         // NC (Créditos)
+            fila[7] = 0;                // NV (Veces llevado)
+            fila[8] = matriculado;      // * (Checkbox)
+            fila[9] = grupo;            // GRUPO
+
+            // 5. Subimos la fila a la tabla
+            TablaCursos.addRow(fila);
         }
     }
 
