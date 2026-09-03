@@ -317,6 +317,7 @@ public class PANEL02_PRINCIPAL_ESTUDIANTES extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBoletaActionPerformed
 
     private void btnMatriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMatriculaActionPerformed
+        matricula = bd.getarraymatricula();
         mostrarPanel(new PnlMatricula(cursos, matricula, a));
     }//GEN-LAST:event_btnMatriculaActionPerformed
 

@@ -20,14 +20,16 @@ import java.sql.PreparedStatement;
 public class CLASS_MAIN_CAPTURA {
 
     ////////////////////////////////////////////////////
-     public Connection con;
+    public Connection con;
     public Statement st;
     public PreparedStatement pst;
-
     ////////////////////////////////////////////////////
+
+    public CLASS_MAIN_CAPTURA() {
+        prepararbasededatos();
+    }
     
-    
-     public void prepararbasededatos() {
+    public void prepararbasededatos() {
         String controlador = "com.mysql.cj.jdbc.Driver";
         String driver = "jdbc:mysql://localhost:3306/poo";
         String user = "root";
@@ -282,24 +284,7 @@ public class CLASS_MAIN_CAPTURA {
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////
-     /////////////////////////////////////////////////////////////////////////////
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     ///FALTA TODO MATRICULA
-     
-     ///
-     ///
-  ///
-  ///
+  
   
      public ArrayList<MATRICULA> getarraymatricula() {
 

@@ -13,14 +13,14 @@ public class PnlMatricula extends javax.swing.JPanel {
     CLASS_MAIN_CAPTURA bd = new CLASS_MAIN_CAPTURA();
 
     ArrayList<MATRICULA> matricula;
-    ArrayList<CURSO> curso;
+    ArrayList<CURSO> cursos;
     ALUMNO a;
     private DefaultTableModel TablaCursos;
 
-    public PnlMatricula(ArrayList<CURSO> cruso, ArrayList<MATRICULA> matricula, ALUMNO a) {
+    public PnlMatricula(ArrayList<CURSO> cursos, ArrayList<MATRICULA> matricula, ALUMNO a) {
         initComponents();
-        this.matricula = matricula;
-        this.curso = curso;
+        this.matricula = (matricula != null) ? matricula : bd.getarraymatricula();
+        this.cursos = (cursos != null && !cursos.isEmpty()) ? cursos : bd.getarraycurso();
         this.a = a;
 //        cargarAlumno();
         TablaCursos = (DefaultTableModel) jTable1.getModel();
@@ -43,12 +43,14 @@ public class PnlMatricula extends javax.swing.JPanel {
 //        lbldatosalumno.setText(a.getCodigo() + " " + a.getNombre_completo());
 //    }
     void cargarCursos() {
-        curso.get(0).getNombrecurso();
+        if (cursos != null && !cursos.isEmpty()) {
+            cursos.get(0).getNombrecurso();
+        }
     }
 
     void CargarDatosAlumnos() {
         if (a != null) {
-            lbldatosalumno.setText("ALUMNO" + a.getCodigo() + " - " + a.getNombre_completo());
+            lbldatosalumno.setText("ALUMNO: " + a.getCodigo() + " - " + a.getNombre_completo());
         } //else {
 //        lbldatosalumno.setText(" 0002123323 - ALUMNO DE PRUEBA");
 //    }
@@ -69,19 +71,18 @@ public class PnlMatricula extends javax.swing.JPanel {
     private void inicializarTabla() {
         String[] columnas = {
             "N°", "CODIGO", "NOMBRE CURSO", "CICLO", "TIPO",
-            "EST", "PLAN", "NC", "NV", "*", "GRUPO", "R.P.G."
-        };
+            "EST", "NC", "NV", "*", "GRUPO"};
 
         jTable1.getTableHeader().setReorderingAllowed(false);
         TablaCursos = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 9;
+                return false;
             }
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 9) {
+                if (columnIndex == 8) {
                     return Boolean.class;
                 }
                 return super.getColumnClass(columnIndex);
@@ -92,13 +93,17 @@ public class PnlMatricula extends javax.swing.JPanel {
 
     private void cargarCursosEnTabla() {
         TablaCursos.setRowCount(0);
-        System.out.println("Cantidad de cursos recibidos: " + (curso != null ? curso.size() : "es null"));
-        if (curso != null) {
-            for (int i = 0; i < curso.size(); i++) {
-                CURSO c = curso.get(i);
+        if (cursos == null || cursos.isEmpty()) {
+            cursos = bd.getarraycurso();
+        }
+        System.out.println("Cantidad de cursos recibidos: " + (cursos != null ? cursos.size() : "es null"));
+        if (cursos != null) {
+            for (int i = 0; i < cursos.size(); i++) {
+                CURSO c = cursos.get(i);
                 String nombre = (c.getNombrecurso() != null) ? c.getNombrecurso().trim().toUpperCase() : "";
-                String codigo = "EGTIC10";
-                int creditos = 1;
+                String codigo = "CUR" + String.format("%03d", (i + 1));
+                int creditos = 4;
+
                 if (nombre.contains("TECNOLOGIAS DE LAS INFORMACIONES")) {
                     codigo = "EGTIC10";
                     creditos = 1;
@@ -120,25 +125,32 @@ public class PnlMatricula extends javax.swing.JPanel {
                 } else if (nombre.contains("ANALISIS DE SISTEMAS")) {
                     codigo = "ESADS08";
                     creditos = 3;
-                } else if (nombre.contains("MODELAMIENTO Y ADMINISTRACION DE BASE DE DATOS")) {
+                } else if (nombre.contains("BASE DE DATOS")) {
                     codigo = "ESBDD09";
                     creditos = 3;
                 }
 
+                String estado = "P";
+                boolean yaMatriculado = false;
+                String grupo = "";
+
+                if (matricula != null && a != null) {
+                    for (MATRICULA m : matricula) {
+                        if (m.getAlumno() != null && m.getCurso() != null
+                                && m.getAlumno().getCodigo() != null
+                                && m.getAlumno().getCodigo().equals(a.getCodigo())
+                                && m.getCurso().getNombrecurso() != null
+                                && m.getCurso().getNombrecurso().equalsIgnoreCase(c.getNombrecurso())) {
+                            estado = "M";
+                            yaMatriculado = true;
+                            grupo = "A";
+                            break;
+                        }
+                    }
+                }
+
                 Object[] fila = new Object[]{
-                    (i + 1),
-                    codigo,
-                    c.getNombrecurso(),
-                    "05",
-                    "O",
-                    "P",
-                    "1K",
-                    creditos,
-                    0,
-                    false,
-                    "",
-                    ""
-                };
+                    (i + 1), codigo, c.getNombrecurso(), "05", "O", estado, creditos, 0, yaMatriculado, grupo};
                 TablaCursos.addRow(fila);
             }
         }
@@ -149,7 +161,7 @@ public class PnlMatricula extends javax.swing.JPanel {
         if (filaSeleccionada != -1) {
 
             Object estadoObj = jTable1.getValueAt(filaSeleccionada, 5);
-            Object checkObj = jTable1.getValueAt(filaSeleccionada, 9);
+            Object checkObj = jTable1.getValueAt(filaSeleccionada, 8);
 
             String estado = "";
             if (estadoObj != null) {
@@ -157,7 +169,7 @@ public class PnlMatricula extends javax.swing.JPanel {
             }
 
             boolean estaCheck = false;
-            if (checkObj != null) {
+            if (checkObj instanceof Boolean) {
                 estaCheck = (Boolean) checkObj;
             }
 
@@ -182,14 +194,14 @@ public class PnlMatricula extends javax.swing.JPanel {
                 txtCurso.setText("");
             }
 
-            Object valorCR = jTable1.getValueAt(filaSeleccionada, 7);
+            Object valorCR = jTable1.getValueAt(filaSeleccionada, 6);
             if (valorCR != null) {
                 txtCR.setText(valorCR.toString());
             } else {
                 txtCR.setText("");
             }
 
-            Object valorGrupo = jTable1.getValueAt(filaSeleccionada, 10);
+            Object valorGrupo = jTable1.getValueAt(filaSeleccionada, 9);
             if (valorGrupo != null && !valorGrupo.toString().trim().isEmpty()) {
                 cboGrupo.setSelectedItem(valorGrupo.toString().trim());
             } else {
@@ -556,8 +568,8 @@ public class PnlMatricula extends javax.swing.JPanel {
         String grupoSeleccionado = cboGrupo.getSelectedItem().toString();
 
         jTable1.setValueAt("M", filaSeleccionada, 5);
-        jTable1.setValueAt(true, filaSeleccionada, 9);
-        jTable1.setValueAt(grupoSeleccionado, filaSeleccionada, 10);
+        jTable1.setValueAt(true, filaSeleccionada, 8);
+        jTable1.setValueAt(grupoSeleccionado, filaSeleccionada, 9);
 
         if (matricula == null) {
             matricula = new ArrayList<>();
@@ -565,14 +577,25 @@ public class PnlMatricula extends javax.swing.JPanel {
 
         MATRICULA m = new MATRICULA();
         m.setAlumno(a);
-        if (curso != null && filaSeleccionada < curso.size()) {
-            m.setCurso(curso.get(filaSeleccionada));
+        if (cursos != null && filaSeleccionada < cursos.size()) {
+            m.setCurso(cursos.get(filaSeleccionada));
+        }
+        m.setCiclorelativo("V");
+        m.setEstado("En Curso");
+        try {
+            Object crObj = jTable1.getValueAt(filaSeleccionada, 6);
+            if (crObj != null) {
+                m.setCreditos(Integer.parseInt(crObj.toString()));
+            }
+        } catch (Exception ex) {
+            m.setCreditos(3);
         }
 
         matricula.add(m);
         bd.setarraymatricula(matricula);
 
         JOptionPane.showMessageDialog(this, "Curso matriculado correctamente.");
+        btnMatricular.setEnabled(false);
         limpiarCampos();
 
     }//GEN-LAST:event_btnMatricularActionPerformed
