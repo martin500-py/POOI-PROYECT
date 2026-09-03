@@ -4,6 +4,8 @@ import BASE_DE_dATOS.CLASS_MAIN_CAPTURA;
 import CLASESCURSO_DETALLECLASE.CURSO;
 import CLASESCURSO_DETALLECLASE.MATRICULA;
 import CLASES_HUMANO.ALUMNO;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -29,6 +31,7 @@ public class PnlMatricula extends javax.swing.JPanel {
         CargarDatosAlumnos();
         inicializarTabla();
         cargarCursosEnTabla();
+        
     }
 
     void cargar() {
@@ -46,6 +49,13 @@ public class PnlMatricula extends javax.swing.JPanel {
         } else {
             lbldatosalumno.setText(" null");
         }
+       
+        LocalDate fechaActual;
+        fechaActual = LocalDate.now();
+        String fecha;
+        fecha = fechaActual.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        LblFecha.setText("FECHA  " + fecha );
+        
     }
 
     private void inicializarTabla() {
